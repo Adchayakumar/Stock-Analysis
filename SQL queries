@@ -1,0 +1,195 @@
+CREATE DATABASE stock_db;
+
+use stock_db;
+
+CREATE TABLE tickers (
+    ticker_id INT PRIMARY KEY AUTO_INCREMENT,  -- Auto-increment for unique IDs
+    ticker_name VARCHAR(50) UNIQUE,           -- e.g., 'ADANIGREEN'
+    company_name VARCHAR(100),                -- e.g., 'ADANI ENTERPRISES'
+    sector VARCHAR(50)                        -- e.g., 'MISCELLANEOUS'
+);
+
+
+
+
+
+CREATE TABLE stock_data (
+    data_id INT PRIMARY KEY AUTO_INCREMENT,
+    ticker_id INT,
+    date DATE,
+    open DECIMAL(10,2),
+    high DECIMAL(10,2),
+    low DECIMAL(10,2),
+    close DECIMAL(10,2),
+    volume BIGINT,
+    daily_return DECIMAL(5,2),
+    cumulative_return DECIMAL(10,2),
+    FOREIGN KEY (ticker_id) REFERENCES tickers(ticker_id)
+);
+
+  
+
+
+update tickers set ticker_name=' BRITANNIA', company_name=" BRITANNIA", sector="Food" WHERE ticker_name="IOC";
+   
+ 
+select DISTINCT ticker_id from stock_data;
+
+update tickers set sector='FOOD' where ticker_id=26;
+
+
+SELECT
+  `t`.`ticker_name`,
+  AVG(`s`.`volume`) AS `volume`
+FROM
+  `stock_data` `s`
+  JOIN `tickers` `t` ON `t`.`ticker_id` = `s`.`ticker_id`
+GROUP BY
+  `t`.`ticker_name`
+ORDER BY
+  `volume` DESC;  
+  
+
+
+
+SELECT
+  `t`.`ticker_name`,
+  -- First close in October 2023
+  (
+    SELECT
+      `sd`.`close`
+    FROM
+      `stock_data` `sd`
+    WHERE
+      `sd`.`ticker_id` = `s`.`ticker_id`
+      AND `sd`.`date` >= '2023-10-01'
+      AND `sd`.`date` <= '2023-10-31'
+    ORDER BY
+      `sd`.`date` ASC
+    LIMIT
+      1
+  ) AS `start_close`,
+  -- Last close in October 2024
+  (
+    SELECT
+      `sd`.`close`
+    FROM
+      `stock_data` `sd`
+    WHERE
+      `sd`.`ticker_id` = `s`.`ticker_id`
+      AND `sd`.`date` >= '2024-10-01'
+      AND `sd`.`date` <= '2024-10-31'
+    ORDER BY
+      `sd`.`date` DESC
+    LIMIT
+      1
+  ) AS `end_close`
+FROM
+  `tickers` `t`
+  JOIN `stock_data` `s` ON `t`.`ticker_id` = `s`.`ticker_id`
+GROUP BY
+  `t`.`ticker_id`;
+
+  
+  
+  
+  
+  SELECT
+  ticker,
+  -- First close in October 2023
+  (SELECT close FROM stock_prices 
+   WHERE ticker = s.ticker 
+     AND date >= '2023-10-01' AND date <= '2023-10-31' 
+   ORDER BY date ASC 
+   LIMIT 1) AS start_close,
+  -- Last close in October 2024
+  (SELECT close FROM stock_prices 
+   WHERE ticker = s.ticker 
+     AND date >= '2024-10-01' AND date <= '2024-10-31' 
+   ORDER BY date DESC 
+   LIMIT 1) AS end_close
+FROM stock_prices s
+GROUP BY ticker;
+
+
+
+
+WITH top_tickers AS (
+  SELECT 
+    t.ticker_name,
+    s.cumulative_return
+  FROM stock_data s
+  JOIN tickers t ON s.ticker_id = t.ticker_id
+  WHERE s.date = '2024-11-22'
+  ORDER BY s.cumulative_return DESC
+  LIMIT 5
+)
+
+SELECT 
+  t.ticker_name,
+  s.date,
+  s.cumulative_return
+FROM stock_data s
+JOIN tickers t ON s.ticker_id = t.ticker_id
+WHERE t.ticker_name IN (SELECT ticker_name FROM top_tickers)
+ORDER BY s.date;
+
+
+
+        SELECT t.ticker_name, AVG(s.volume) as volume
+        FROM stock_data s
+        JOIN tickers t ON t.ticker_id = s.ticker_id
+        GROUP BY t.ticker_name
+        ORDER BY volume DESC;
+
+SELECT sector ,group GROUP_CONCAT (ticker_id) from tickers GROUP by sector;
+
+select avg(s.volume),CAST(AVG (s.close) as DECIMAL(10,2)) as close , t.sector from stock_data s join tickers t on 
+s.ticker_id=t.ticker_id GROUP BY t.sector;
+
+select cast(STD( s.daily_return)  as DECIMAL(10,2)) as volatility, t.ticker_name from stock_data s join tickers t on 
+  s.ticker_id = t.ticker_id group by t.ticker_name order by volatility ASC;
+
+SELECT s.date , s.close , t.ticker_name from stock_data s join tickers t on s.ticker_id=t.ticker_id
+  order by date asc;
+
+
+SHOW COLUMNS  FROM stock_data;
+SHOW COLUMNS FROM tickers;
+
+
+WITH monthly_prices AS (
+  SELECT
+    t.ticker_name,
+    DATE_FORMAT(s.date, '%Y-%m') AS month,  -- For MySQL/MariaDB
+    s.close,
+    FIRST_VALUE(s.close) OVER (
+      PARTITION BY s.ticker_id, DATE_FORMAT(s.date, '%Y-%m')
+      ORDER BY s.date
+      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS first_close,
+    LAST_VALUE(s.close) OVER (
+      PARTITION BY s.ticker_id, DATE_FORMAT(s.date, '%Y-%m')
+      ORDER BY s.date
+      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) AS last_close
+  FROM stock_data s
+  JOIN tickers t ON s.ticker_id = t.ticker_id
+)
+SELECT
+  ticker_name,
+  month,
+  ROUND(((last_close - first_close) / first_close * 100), 2) AS return_pct
+FROM monthly_prices
+GROUP BY ticker_name, month;
+
+
+SELECT return from tickers;
+
+
+ SELECT 
+   ticker_name AS Ticker,
+    sector AS Sector,
+  company_name AS Company,
+    return as `Yearly Return`            
+     FROM tickers;
