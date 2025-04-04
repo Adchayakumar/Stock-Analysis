@@ -1,6 +1,6 @@
 # Stock Analysis
 
-Stock Analysis is a project designed to analyze stock market data. It cleans, manipulates, and visualizes stock data using Python and Power BI. This project helps investors and analysts gain insights into market trends and make data-driven decisions.
+The Stock Performance Dashboard aims to provide a comprehensive visualization and analysis of the Nifty 50 stocks' performance over the past year, helping investors, analysts, and enthusiasts make informed decisions based on stock performance trends.
 
 # Raw data sample
    - Ticker: SBIN
