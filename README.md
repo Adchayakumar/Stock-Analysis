@@ -4,13 +4,13 @@ Stock Analysis is a project designed to analyze stock market data. It cleans, ma
 
 # Raw data sample
    - Ticker: SBIN
- - close: 602.95
- - date: '2023-10-03 05:30:00'
+   - close: 602.95
+   - date: '2023-10-03 05:30:00'
    - high: 604.9
- - low: 589.6
- - month: 2023-10
- - open: 596.6
- - volume: 15322196
+   - low: 589.6
+   - month: 2023-10
+   - open: 596.6
+   - volume: 15322196
 
 
 
