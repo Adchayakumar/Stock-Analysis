@@ -2,6 +2,18 @@
 
 Stock Analysis is a project designed to analyze stock market data. It cleans, manipulates, and visualizes stock data using Python and Power BI. This project helps investors and analysts gain insights into market trends and make data-driven decisions.
 
+# Raw data sample
+   - Ticker: SBIN
+  close: 602.95
+  date: '2023-10-03 05:30:00'
+  high: 604.9
+  low: 589.6
+  month: 2023-10
+  open: 596.6
+  volume: 15322196
+
+
+
 ## Features
 - Convert YAML data to CSV format.
 - Clean and manipulate stock data using Python scripts.
